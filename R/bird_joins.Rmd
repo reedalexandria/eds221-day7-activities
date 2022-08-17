@@ -1,0 +1,76 @@
+---
+title: "Day 7 Activities"
+output: html_document
+date: "2022-08-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(lubridate)
+```
+
+```{r}
+bird_observations <- read.csv(here::here("data", "52_pp52_birds_1.csv"))
+sites <- read.csv(here::here("data", "52_pp52_sites_1.csv"))
+surveys <- read.csv(here::here("data", "52_pp52_surveys_1.csv"))
+taxalist <- read.csv(here::here("data", "52_pp52_taxalist_1.csv"))
+
+birds_subset <- bird_observations |>
+  filter(species_id %in% c("BHCO", "RWBL"),
+         site_id %in% c("LI-W", "NU-C"))
+```
+
+### Left join practice
+
+```{r}
+birds_subset_left <- left_join(birds_subset, sites, by = "site_id") |>
+  left_join(taxalist, by = "species_id")
+```
+
+### Full join practice
+
+```{r}
+# all data combined 
+birds_full <- full_join(birds_subset, sites, by = "site_id")
+```
+
+### Inner join practice
+
+```{r}
+# only species in subset will show up, other taxalist species will be deleted
+birds_inner <- inner_join(birds_subset, taxalist, by = "species_id")
+
+```
+
+## Task 2
+
+```{r}
+birds <- bird_observations |>
+  rename(birds_obs_notes = notes) |>
+  left_join(sites, by = "site_id") |>
+  left_join(taxalist, by = "species_id") |>
+  left_join(surveys, 
+            by = c("site_id", "survey_id")) |>
+  select(survey_date, common_name, park_name, bird_count) |>
+  mutate(survey_month = month(survey_date)) |>
+  mutate(survey_month = as.factor(survey_month)) |>
+  relocate(survey_month, .after = survey_date) |>
+  group_by(park_name, survey_month) |>
+  summarize(count = n()) |>
+  filter(park_name %in% c("Lindo", "Orme", "Palomino", "Sonrisa"))
+
+```
+
+## Task 3
+
+```{r}
+
+```
+
+
+
+
+
+
