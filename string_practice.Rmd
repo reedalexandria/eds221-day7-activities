@@ -6,24 +6,42 @@ date: "2022-08-16"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
-## R Markdown
+```{r}
+alarm_report <- data.frame(
+  stringsAsFactors = FALSE,
+                              date = c("2020-03-14","2020-03-15","2020-04-10",
+                                       "2020-04-18"),
+                          building = c("Engineering-North","Bren Hall",
+                                       "Engineering-South","Engr-North"),
+                     alarm_message = c("10:02am – HVAC system down, facilities management alerted",
+                                       "8:24am – Elevator North out of service",
+                                       "12:41am – Fire alarm, UCSB fire responded and cleared",
+                                       "9:58pm – Campus point emergency siren, UCPD responded")
+                )
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+```{r}
+alarm_report2 <- alarm_report |>
+  mutate(building = str_replace(building, pattern = "Engr", replacement = "Engineering")) |>
+  separate(col = building, into = c("building", "wing"), sep = "-") |>
+  filter(str_detect(alarm_message, pattern = "responded")) |>
+  separate(col = alarm_message, into =  c("time", "alarm_message"), sep = "–") |>
+  mutate(date = ymd(date))
+  
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+  
+  
+  
+  
+  
+  
+  
